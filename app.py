@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
-
 app.secret_key = "travel_story_database"
 
 USERNAME = "raiv"
@@ -8,10 +7,8 @@ PASSWORD = "64843810"
 
 @app.route("/")
 def home():
-    if "database_authorized" in session:
-        return redirect(url_for("database"))
     return redirect(url_for("database"))
-    
+
 @app.route("/database", methods=["GET", "POST"])
 def database():
     error = None
@@ -21,10 +18,9 @@ def database():
         if username == USERNAME and password == PASSWORD:
             session["database_authorized"] = True
             return redirect(url_for("database"))
-        else:
-            error = "Unauthorized: Invalid username or password."
+        error = "Unauthorized: Invalid username or password."
     authorized = session.get("database_authorized", False)
-    return render_template( "database.html", authorized=authorized,error=error)
+    return render_template("index.html", authorized=authorized, error=error)
 
 @app.route("/database/logout")
 def database_logout():
