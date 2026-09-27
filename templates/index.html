@@ -3,91 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Story - Login</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-        .login-container {
-            width: 380px;
-            padding: 35px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-        }
-        .login-container h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .login-container p {
-            text-align: center;
-            color: #777;
-            margin-bottom: 25px;
-        }
-        .form-group {
-            margin-bottom: 18px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-        }
-        .form-group input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
-        }
-        .login-btn {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 8px;
-            background: #667eea;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .login-btn:hover {
-            background: #5568d8;
-        }
-        .error {
-            padding: 10px;
-            margin-bottom: 18px;
-            border-radius: 6px;
-            background: #ffe5e5;
-            color: #d00000;
-            text-align: center;
-        }
-        .success {
-            padding: 10px;
-            margin-bottom: 18px;
-            border-radius: 6px;
-            background: #e5ffe9;
-            color: #087a18;
-            text-align: center;
-        }
-    </style>
+    <title>Travel Story - Database</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div class="login-container">
@@ -101,35 +18,14 @@
     <form action="{{ url_for('login') }}" method="POST">
         <div class="form-group">
             <label for="username">Username</label>
-            <input
-                type="text"
-                id="username"
-                name="username"
-                placeholder="Enter username"
-                required
-                autocomplete="username">
+            <input type="text" id="username" name="username" placeholder="Enter username" required autocomplete="username">
         </div>
-
         <div class="form-group">
             <label for="password">Password</label>
-
-            <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Enter password"
-                required
-                autocomplete="current-password"
-            >
+            <input type="password" id="password" name="password" placeholder="Enter password" required autocomplete="current-password">
         </div>
-
-        <button type="submit" class="login-btn">
-            Login
-        </button>
-
+        <button type="submit" class="login-btn">Login</button>
     </form>
-
 </div>
-
 </body>
 </html>
