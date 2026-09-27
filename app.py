@@ -6,6 +6,12 @@ app.secret_key = "travel_story_database"
 USERNAME = "raiv"
 PASSWORD = "64843810"
 
+@app.route("/")
+def home():
+    if "database_authorized" in session:
+        return redirect(url_for("database"))
+    return redirect(url_for("database"))
+    
 @app.route("/database", methods=["GET", "POST"])
 def database():
     error = None
