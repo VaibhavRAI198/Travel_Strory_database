@@ -12,6 +12,7 @@ def home():
 @app.route("/database", methods=["GET", "POST"])
 def database():
     error = None
+    tables = []
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
@@ -20,7 +21,47 @@ def database():
             return redirect(url_for("database"))
         error = "Unauthorized: Invalid username or password."
     authorized = session.get("database_authorized", False)
-    return render_template("index.html", authorized=authorized, error=error)
+    if authorized:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                  AND table_type = 'BASE TABLE'
+                ORDER BY table_name;
+            """)
+            table_rows = cursor.fetchall()
+            for row in table_rows:
+                table_name = row[0]
+                cursor.execute("""
+                    SELECT
+                        column_name,
+                        data_type,
+                        is_nullable
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = %s
+                    ORDER BY ordinal_position;
+                """, (table_name,))
+                columns = cursor.fetchall()
+                cursor.execute(
+                    f'SELECT * FROM "{table_name}"'
+                )
+                data = cursor.fetchall()
+                column_names = [desc[0] for desc in cursor.description]
+                tables.append({
+                    "name": table_name,
+                    "columns": columns,
+                    "column_names": column_names,
+                    "data": data
+                })
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            error = f"Database error: {e}"
+    return render_template( "index.html", authorized=authorized, error=error, tables=tables)
 
 @app.route("/database/logout")
 def database_logout():
