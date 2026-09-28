@@ -69,6 +69,43 @@ def database():
             error = f"Database error: {e}"
     return render_template( "index.html", authorized=authorized, error=error, tables=tables)
 
+
+@app.route("/delete_table", methods=["POST"])
+def delete_table():
+    if not session.get("database_authorized", False):
+        return redirect(url_for("database"))
+    table_name = request.form.get("table_name", "").strip()
+    if not table_name:
+        return redirect(url_for("database"))
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                  AND table_name = %s
+            );
+        """, (table_name,))
+        exists = cursor.fetchone()[0]
+        if not exists:
+            cursor.close()
+            conn.close()
+            return redirect(url_for("database"))
+        cursor.execute('DROP TABLE public."' + table_name.replace('"', '""') + '" CASCADE')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for("database"))
+    except Exception as e:
+        if 'conn' in locals():
+            conn.rollback()
+            conn.close()
+        return render_template("index.html",authorized=True,error=f"Unable to delete table: {e}",tables=[])
+
+
+
 @app.route("/database_logout")
 def database_logout():
     session.pop("database_authorized", None)
