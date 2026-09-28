@@ -126,5 +126,139 @@ def create_table():
         return render_template("create_table.html")
     return render_template("create_table.html")
 
+@app.route("/create_table", methods=["GET", "POST"])
+def create_table():
+
+    # Check authorization
+    if not session.get("database_authorized", False):
+        return redirect(url_for("database"))
+
+    if request.method == "GET":
+        return render_template("createtable.html")
+
+    # Get table name from HTML
+    table_name = request.form.get("table_name", "").strip()
+
+    # Get columns from HTML
+    column_names = request.form.getlist("column_name")
+    data_types = request.form.getlist("data_type")
+
+    if not table_name:
+        return render_template(
+            "createtable.html",
+            error="Table name is required."
+        )
+
+    if not column_names:
+        return render_template(
+            "createtable.html",
+            error="At least one column is required."
+        )
+
+    # Validate table name
+    if not table_name.replace("_", "").isalnum():
+        return render_template(
+            "createtable.html",
+            error="Invalid table name."
+        )
+
+    allowed_types = {
+        "INTEGER",
+        "BIGINT",
+        "SERIAL",
+        "BIGSERIAL",
+        "VARCHAR(255)",
+        "TEXT",
+        "BOOLEAN",
+        "DATE",
+        "TIMESTAMP",
+        "NUMERIC",
+        "REAL",
+        "DOUBLE PRECISION"
+    }
+
+    try:
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check table already exists
+        cursor.execute("""
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = %s
+            )
+        """, (table_name,))
+
+        if cursor.fetchone()[0]:
+
+            cursor.close()
+            conn.close()
+
+            return render_template(
+                "createtable.html",
+                error=f"Table '{table_name}' already exists."
+            )
+
+        # Build columns
+        column_definitions = []
+
+        for column_name, data_type in zip(
+            column_names,
+            data_types
+        ):
+
+            column_name = column_name.strip()
+            data_type = data_type.strip().upper()
+
+            if not column_name:
+                raise ValueError(
+                    "Column name cannot be empty."
+                )
+
+            if not column_name.replace("_", "").isalnum():
+                raise ValueError(
+                    f"Invalid column name: {column_name}"
+                )
+
+            if data_type not in allowed_types:
+                raise ValueError(
+                    f"Invalid data type: {data_type}"
+                )
+
+            column_definitions.append(
+                f'"{column_name}" {data_type}'
+            )
+
+        # Create table
+        sql = f'''
+            CREATE TABLE public."{table_name}" (
+                {", ".join(column_definitions)}
+            )
+        '''
+
+        cursor.execute(sql)
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for("database"))
+
+    except Exception as e:
+
+        if "conn" in locals():
+            conn.rollback()
+            conn.close()
+
+        return render_template(
+            "createtable.html",
+            error=f"Database error: {e}"
+        )
+
+
 if __name__ == "__main__":
     app.run(debug=True)
