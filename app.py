@@ -104,12 +104,27 @@ def delete_table():
             conn.close()
         return render_template("index.html",authorized=True,error=f"Unable to delete table: {e}",tables=[])
 
-
-
 @app.route("/database_logout")
 def database_logout():
     session.pop("database_authorized", None)
     return redirect(url_for("database"))
+
+@app.route("/edit_table", methods=["GET", "POST"])
+def edit_table():
+    if not session.get("database_authorized", False):
+        return redirect(url_for("database"))
+    if request.method == "GET":
+        return render_template("edit_table.html")
+    return render_template("edit_table.html")
+
+
+@app.route("/create_table", methods=["GET", "POST"])
+def create_table():
+    if not session.get("database_authorized", False):
+        return redirect(url_for("database"))
+    if request.method == "GET":
+        return render_template("create_table.html")
+    return render_template("create_table.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
