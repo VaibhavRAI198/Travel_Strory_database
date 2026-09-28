@@ -1,1 +1,397 @@
-Create table
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Travel Story - Create Table</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='create_table.css') }}">
+</head>
+
+<body>
+
+<div class="create-table-container">
+
+    <!-- HEADER -->
+    <div class="create-table-header">
+
+        <div>
+            <h1>Create Table</h1>
+            <p>Create a new PostgreSQL database table</p>
+        </div>
+
+        <a href="{{ url_for('database') }}" class="back-btn">
+            ← Back to Database
+        </a>
+
+    </div>
+
+
+    <!-- ERROR MESSAGE -->
+    {% if error %}
+    <div class="error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+
+    <!-- SUCCESS MESSAGE -->
+    {% if success %}
+    <div class="success">
+        {{ success }}
+    </div>
+    {% endif %}
+
+
+    <!-- CREATE TABLE FORM -->
+    <form method="POST"
+          action="{{ url_for('create_table') }}"
+          id="createTableForm">
+
+        <!-- TABLE NAME -->
+        <div class="form-section">
+
+            <label for="table_name">
+                Table Name
+            </label>
+
+            <input
+                type="text"
+                id="table_name"
+                name="table_name"
+                placeholder="Example: cities"
+                required
+                pattern="[A-Za-z0-9_]+"
+                title="Only letters, numbers and underscore (_) are allowed."
+            >
+
+            <small>
+                Use only letters, numbers and underscore (_).
+            </small>
+
+        </div>
+
+
+        <!-- COLUMNS HEADER -->
+        <div class="columns-header">
+
+            <div>
+                <h2>Table Columns</h2>
+                <p>Add the columns for your new table.</p>
+            </div>
+
+            <button
+                type="button"
+                class="add-column-btn"
+                onclick="addColumn()">
+
+                + Add Column
+
+            </button>
+
+        </div>
+
+
+        <!-- COLUMNS -->
+        <div id="columnsContainer">
+
+
+            <!-- FIRST COLUMN -->
+            <div class="column-row-form">
+
+
+                <!-- COLUMN NAME -->
+                <div class="column-field">
+
+                    <label>
+                        Column Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="column_name"
+                        placeholder="id"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DATA TYPE -->
+                <div class="column-field">
+
+                    <label>
+                        Data Type
+                    </label>
+
+                    <select
+                        name="data_type"
+                        required>
+
+                        <option value="SERIAL">
+                            SERIAL
+                        </option>
+
+                        <option value="INTEGER">
+                            INTEGER
+                        </option>
+
+                        <option value="BIGINT">
+                            BIGINT
+                        </option>
+
+                        <option value="BIGSERIAL">
+                            BIGSERIAL
+                        </option>
+
+                        <option value="VARCHAR(255)">
+                            VARCHAR(255)
+                        </option>
+
+                        <option value="TEXT">
+                            TEXT
+                        </option>
+
+                        <option value="BOOLEAN">
+                            BOOLEAN
+                        </option>
+
+                        <option value="DATE">
+                            DATE
+                        </option>
+
+                        <option value="TIMESTAMP">
+                            TIMESTAMP
+                        </option>
+
+                        <option value="NUMERIC">
+                            NUMERIC
+                        </option>
+
+                        <option value="REAL">
+                            REAL
+                        </option>
+
+                        <option value="DOUBLE PRECISION">
+                            DOUBLE PRECISION
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- REMOVE -->
+                <div class="column-action">
+
+                    <button
+                        type="button"
+                        class="remove-column-btn"
+                        onclick="removeColumn(this)">
+
+                        Remove
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- FORM ACTIONS -->
+        <div class="form-actions">
+
+            <a href="{{ url_for('database') }}"
+               class="cancel-btn">
+
+                Cancel
+
+            </a>
+
+            <button
+                type="submit"
+                class="create-table-submit">
+
+                Create Table
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+
+// ========================================
+// ADD NEW COLUMN
+// ========================================
+
+function addColumn() {
+
+    const container =
+        document.getElementById(
+            "columnsContainer"
+        );
+
+
+    const row =
+        document.createElement("div");
+
+
+    row.className =
+        "column-row-form";
+
+
+    row.innerHTML = `
+
+        <div class="column-field">
+
+            <label>
+                Column Name
+            </label>
+
+            <input
+                type="text"
+                name="column_name"
+                placeholder="column_name"
+                required
+            >
+
+        </div>
+
+
+        <div class="column-field">
+
+            <label>
+                Data Type
+            </label>
+
+            <select
+                name="data_type"
+                required>
+
+                <option value="SERIAL">
+                    SERIAL
+                </option>
+
+                <option value="INTEGER">
+                    INTEGER
+                </option>
+
+                <option value="BIGINT">
+                    BIGINT
+                </option>
+
+                <option value="BIGSERIAL">
+                    BIGSERIAL
+                </option>
+
+                <option value="VARCHAR(255)">
+                    VARCHAR(255)
+                </option>
+
+                <option value="TEXT">
+                    TEXT
+                </option>
+
+                <option value="BOOLEAN">
+                    BOOLEAN
+                </option>
+
+                <option value="DATE">
+                    DATE
+                </option>
+
+                <option value="TIMESTAMP">
+                    TIMESTAMP
+                </option>
+
+                <option value="NUMERIC">
+                    NUMERIC
+                </option>
+
+                <option value="REAL">
+                    REAL
+                </option>
+
+                <option value="DOUBLE PRECISION">
+                    DOUBLE PRECISION
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="column-action">
+
+            <button
+                type="button"
+                class="remove-column-btn"
+                onclick="removeColumn(this)">
+
+                Remove
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(row);
+
+}
+
+
+
+// ========================================
+// REMOVE COLUMN
+// ========================================
+
+function removeColumn(button) {
+
+    const container =
+        document.getElementById(
+            "columnsContainer"
+        );
+
+
+    const rows =
+        container.querySelectorAll(
+            ".column-row-form"
+        );
+
+
+    // Keep at least one column
+    if (rows.length <= 1) {
+
+        alert(
+            "At least one column is required."
+        );
+
+        return;
+    }
+
+
+    button
+        .closest(".column-row-form")
+        .remove();
+
+}
+
+</script>
+
+
+</body>
+</html>
