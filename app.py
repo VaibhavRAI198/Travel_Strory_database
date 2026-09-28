@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import psycopg2
+import os
+
 app = Flask(__name__)
 app.secret_key = "travel_story_database"
 
 USERNAME = "raiv"
 PASSWORD = "64843810"
 
+def get_db_connection():
+    return psycopg2.connect(os.environ["DATABASE_URL"])
+    
 @app.route("/")
 def home():
     return redirect(url_for("database"))
@@ -63,7 +69,7 @@ def database():
             error = f"Database error: {e}"
     return render_template( "index.html", authorized=authorized, error=error, tables=tables)
 
-@app.route("/database/logout")
+@app.route("/database_logout")
 def database_logout():
     session.pop("database_authorized", None)
     return redirect(url_for("database"))
