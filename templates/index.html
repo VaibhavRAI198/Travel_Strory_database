@@ -52,7 +52,13 @@
             <table class="database-table">
                 <thead>
                     <tr class="table-name-row">
-                        <th colspan="{{ table.column_names|length }}">{{ table.name }}</th>
+                        <th colspan="{{ table.column_names|length }}">
+                            {{ table.name }}
+                            <form action="/delete_table" method="POST">
+                                <input type="text" value="{{table.name}}" required/>
+                                <input type="submit" value="Delte table"/>
+                            </form>
+                        </th>
                     </tr>
                     <tr class="column-row">
                         {% for column in table.column_names %}
