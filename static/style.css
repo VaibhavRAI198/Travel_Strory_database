@@ -54,7 +54,7 @@ body{min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:radial-g
 .database-empty p{margin-bottom:18px;color:#6b7280}
 .popup-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.72);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility .25s ease}
 .popup-overlay.active{opacity:1;visibility:visible;pointer-events:auto}
-.popup-box{width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(-25px) scale(.96);transition:transform .25s ease}
+.popup-box{overflow-y:scroll;width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(-25px) scale(.96);transition:transform .25s ease}
 .popup-overlay.active .popup-box{transform:translateY(0) scale(1)}
 .popup-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:linear-gradient(135deg,#1e3a8a,#4338ca);color:#fff;flex-shrink:0}
 .popup-header h2{color:#fff;font-size:21px;font-weight:800}
