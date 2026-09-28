@@ -42,39 +42,21 @@
     {% endif %}
     {% if tables %}
     <div class="tables-container">
-        {% for table in tables %}
-        <div class="table-section">
-            <h2>{{ table.name }}</h2>
-            <h3>Columns</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Column Name</th>
-                        <th>Data Type</th>
-                        <th>Nullable</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for column in table.columns %}
-                    <tr>
-                        <td>{{ column[0] }}</td>
-                        <td>{{ column[1] }}</td>
-                        <td>{{ column[2] }}</td>
-                    </tr>
+    {% for table in tables %}
+    <div class="table-section">
+        <table class="database-table">
+            <thead>
+                <tr class="table-name-row">
+                    <th colspan="{{ table.column_names|length }}">{{ table.name }}</th>
+                </tr>
+                <tr class="column-row">
+                    {% for column in table.column_names %}
+                    <th>{{ column }}</th>
                     {% endfor %}
-                </tbody>
-            </table>
-            <h3>Data</h3>
-            {% if table.data %}
-            <table>
-                <thead>
-                    <tr>
-                        {% for column in table.column_names %}
-                        <th>{{ column }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
+                </tr>
+            </thead>
+            <tbody>
+                {% if table.data %}
                     {% for row in table.data %}
                     <tr>
                         {% for value in row %}
@@ -82,14 +64,18 @@
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p class="no-data">No records found in this table.</p>
-            {% endif %}
-        </div>
-        {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="{{ table.column_names|length }}" class="no-data">
+                            No data found in this table.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
+    {% endfor %}
+</div>
     {% else %}
     <div class="no-data">
         <p>No tables found in the PostgreSQL database.</p>
