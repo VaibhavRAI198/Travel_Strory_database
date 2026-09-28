@@ -5,99 +5,768 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Story - Database</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+```
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+```
+
 </head>
+
 <body>
+
 {% if not authorized %}
+
 <div class="login-container">
     <h1>Travel Story Database</h1>
     <p class="subtitle">Authorized Access Only</p>
-    {% if error %}
-    <div class="error">{{ error }}</div>
-    {% endif %}
-    {% if success %}
-    <div class="success">{{ success }}</div>
-    {% endif %}
-    <form action="{{ url_for('database') }}" method="POST">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Enter username" required autocomplete="username">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter password" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="login-btn">Login</button>
-    </form>
+
+```
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+{% if success %}
+<div class="success">{{ success }}</div>
+{% endif %}
+
+<form action="{{ url_for('database') }}" method="POST">
+
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text"
+               id="username"
+               name="username"
+               placeholder="Enter username"
+               required
+               autocomplete="username">
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password"
+               id="password"
+               name="password"
+               placeholder="Enter password"
+               required
+               autocomplete="current-password">
+    </div>
+
+    <button type="submit" class="login-btn">
+        Login
+    </button>
+
+</form>
+```
+
 </div>
+
 {% else %}
+
 <div class="database-container">
-    <div class="database-header">
-        <div>
-            <h1>Travel Story Database</h1>
-            <p class="subtitle">PostgreSQL Database Management</p>
-        </div>
-        <div class="database-actions">
-            <a href="{{ url_for('create_table') }}" class="database-btn create-btn">Create Tables</a>
-            <a href="{{ url_for('database_logout') }}" class="logout-btn">Logout</a>
-        </div>
+
+```
+<!-- HEADER -->
+<div class="database-header">
+
+    <div>
+        <h1>Travel Story Database</h1>
+        <p class="subtitle">
+            PostgreSQL Database Management
+        </p>
     </div>
-    {% if error %}
-    <div class="error">{{ error }}</div>
-    {% endif %}
-    {% if tables %}
-    <div class="tables-container">
-        {% for table in tables %}
-        <div class="table-section">
-            <table class="database-table">
-                <thead>
-                    <tr class="table-name-row">
-                        <th colspan="{{ table.column_names|length }}">
-                            {{ table.name }}
-                            <form action="/delete_table" method="POST">
-                                <input type="hidden" name="table_name" value="{{table.name}}" required/>
-                                <input type="submit" value="Delete table"/>
-                            </form>
-                            <a href="{{ url_for('edit_table') }}" class="database-btn create-btn">Edit Tables</a>
-                        </th>
-                    </tr>
-                    <tr class="column-row">
-                        {% for column in table.column_names %}
-                        <th>{{ column }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if table.data %}
-                    {% for row in table.data %}
-                    <tr>
-                        {% for value in row %}
-                        <td>
-                            {% if value is none %}
-                            <span class="null-value">NULL</span>
-                            {% else %}
-                            {{ value }}
-                            {% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="{{ table.column_names|length }}" class="no-data">No data found in this table.</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-        {% endfor %}
+
+    <div class="database-actions">
+
+        <!-- CREATE TABLE POPUP BUTTON -->
+        <button type="button"
+                class="database-btn create-btn"
+                onclick="openCreatePopup()">
+            + Create Table
+        </button>
+
+        <a href="{{ url_for('database_logout') }}"
+           class="logout-btn">
+            Logout
+        </a>
+
     </div>
-    {% else %}
-    <div class="no-data database-empty">
-        <p>No tables found in the PostgreSQL database.</p>
-    </div>
-    {% endif %}
+</div>
+
+
+<!-- MESSAGES -->
+
+{% if error %}
+<div class="error">
+    {{ error }}
 </div>
 {% endif %}
+
+{% if success %}
+<div class="success">
+    {{ success }}
+</div>
+{% endif %}
+
+
+<!-- TABLES -->
+
+{% if tables %}
+
+<div class="tables-container">
+
+    {% for table in tables %}
+
+    <div class="table-section">
+
+        <table class="database-table">
+
+            <thead>
+
+                <!-- TABLE NAME -->
+
+                <tr class="table-name-row">
+
+                    <th colspan="{{ table.column_names|length }}">
+
+                        <div class="table-title">
+
+                            <span>
+                                {{ table.name }}
+                            </span>
+
+                            <div class="table-actions">
+
+                                <!-- EDIT -->
+                                <button type="button"
+                                        class="small-btn edit-btn"
+                                        onclick='openEditPopup(
+                                            {{ table.name|tojson }},
+                                            {{ table.column_names|tojson }}
+                                        )'>
+                                    Edit
+                                </button>
+
+
+                                <!-- DELETE -->
+
+                                <form action="{{ url_for('delete_table') }}"
+                                      method="POST"
+                                      onsubmit="return confirm(
+                                          'Are you sure you want to delete this table?'
+                                      );">
+
+                                    <input type="hidden"
+                                           name="table_name"
+                                           value="{{ table.name }}">
+
+                                    <button type="submit"
+                                            class="small-btn delete-btn">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </th>
+
+                </tr>
+
+
+                <!-- COLUMN NAMES -->
+
+                <tr class="column-row">
+
+                    {% for column in table.column_names %}
+
+                    <th>
+                        {{ column }}
+                    </th>
+
+                    {% endfor %}
+
+                </tr>
+
+            </thead>
+
+
+            <!-- DATA -->
+
+            <tbody>
+
+            {% if table.data %}
+
+                {% for row in table.data %}
+
+                <tr>
+
+                    {% for value in row %}
+
+                    <td>
+
+                        {% if value is none %}
+
+                            <span class="null-value">
+                                NULL
+                            </span>
+
+                        {% else %}
+
+                            {{ value }}
+
+                        {% endif %}
+
+                    </td>
+
+                    {% endfor %}
+
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+
+                    <td colspan="{{ table.column_names|length }}"
+                        class="no-data">
+
+                        No data found in this table.
+
+                    </td>
+
+                </tr>
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="no-data database-empty">
+
+    <p>
+        No tables found in the PostgreSQL database.
+    </p>
+
+    <button type="button"
+            class="database-btn create-btn"
+            onclick="openCreatePopup()">
+
+        + Create Your First Table
+
+    </button>
+
+</div>
+
+{% endif %}
+```
+
+</div>
+
+<!-- =====================================================
+     CREATE TABLE POPUP
+===================================================== -->
+
+<div id="createPopup"
+     class="popup-overlay"
+     onclick="closePopupOutside(event, 'createPopup')">
+
+```
+<div class="popup-box">
+
+    <div class="popup-header">
+
+        <h2>Create Table</h2>
+
+        <button type="button"
+                class="close-btn"
+                onclick="closeCreatePopup()">
+            &times;
+        </button>
+
+    </div>
+
+
+    <form action="{{ url_for('create_table') }}"
+          method="POST"
+          id="createTableForm">
+
+        <div class="popup-body">
+
+            <!-- TABLE NAME -->
+
+            <div class="form-group">
+
+                <label for="create_table_name">
+                    Table Name
+                </label>
+
+                <input type="text"
+                       id="create_table_name"
+                       name="table_name"
+                       placeholder="Example: cities"
+                       required>
+
+            </div>
+
+
+            <!-- COLUMNS -->
+
+            <div class="columns-header">
+
+                <h3>Columns</h3>
+
+                <button type="button"
+                        class="add-column-btn"
+                        onclick="addCreateColumn()">
+
+                    + Add Column
+
+                </button>
+
+            </div>
+
+
+            <div id="createColumns">
+
+                <div class="column-form-row">
+
+                    <input type="text"
+                           name="column_name[]"
+                           placeholder="Column name"
+                           required>
+
+                    <select name="column_type[]">
+
+                        <option value="VARCHAR(255)">
+                            VARCHAR(255)
+                        </option>
+
+                        <option value="TEXT">
+                            TEXT
+                        </option>
+
+                        <option value="INTEGER">
+                            INTEGER
+                        </option>
+
+                        <option value="BIGINT">
+                            BIGINT
+                        </option>
+
+                        <option value="BOOLEAN">
+                            BOOLEAN
+                        </option>
+
+                        <option value="DATE">
+                            DATE
+                        </option>
+
+                        <option value="TIMESTAMP">
+                            TIMESTAMP
+                        </option>
+
+                        <option value="NUMERIC">
+                            NUMERIC
+                        </option>
+
+                    </select>
+
+                    <button type="button"
+                            class="remove-column-btn"
+                            onclick="removeColumn(this)">
+                        ×
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="popup-footer">
+
+            <button type="button"
+                    class="cancel-btn"
+                    onclick="closeCreatePopup()">
+                Cancel
+            </button>
+
+            <button type="submit"
+                    class="submit-btn">
+                Create Table
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+```
+
+</div>
+
+<!-- =====================================================
+     EDIT TABLE POPUP
+===================================================== -->
+
+<div id="editPopup"
+     class="popup-overlay"
+     onclick="closePopupOutside(event, 'editPopup')">
+
+```
+<div class="popup-box">
+
+    <div class="popup-header">
+
+        <h2>Edit Table</h2>
+
+        <button type="button"
+                class="close-btn"
+                onclick="closeEditPopup()">
+            &times;
+        </button>
+
+    </div>
+
+
+    <form action="{{ url_for('edit_table') }}"
+          method="POST"
+          id="editTableForm">
+
+        <div class="popup-body">
+
+            <!-- OLD TABLE NAME -->
+
+            <input type="hidden"
+                   id="edit_old_table_name"
+                   name="old_table_name">
+
+
+            <!-- TABLE NAME -->
+
+            <div class="form-group">
+
+                <label for="edit_table_name">
+                    Table Name
+                </label>
+
+                <input type="text"
+                       id="edit_table_name"
+                       name="table_name"
+                       required>
+
+            </div>
+
+
+            <div class="columns-header">
+
+                <h3>Columns</h3>
+
+                <button type="button"
+                        class="add-column-btn"
+                        onclick="addEditColumn()">
+
+                    + Add Column
+
+                </button>
+
+            </div>
+
+
+            <div id="editColumns"></div>
+
+        </div>
+
+
+        <div class="popup-footer">
+
+            <button type="button"
+                    class="cancel-btn"
+                    onclick="closeEditPopup()">
+
+                Cancel
+
+            </button>
+
+            <button type="submit"
+                    class="submit-btn">
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+```
+
+</div>
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+function openCreatePopup() {
+
+    document.getElementById("createPopup").classList.add("active");
+
+    document.body.classList.add("popup-open");
+}
+
+
+function closeCreatePopup() {
+
+    document.getElementById("createPopup").classList.remove("active");
+
+    document.body.classList.remove("popup-open");
+}
+
+
+function openEditPopup(tableName, columns) {
+
+    document.getElementById("editPopup").classList.add("active");
+
+    document.body.classList.add("popup-open");
+
+    document.getElementById("edit_old_table_name").value = tableName;
+
+    document.getElementById("edit_table_name").value = tableName;
+
+    const container = document.getElementById("editColumns");
+
+    container.innerHTML = "";
+
+    columns.forEach(function(column) {
+
+        addEditColumn(column);
+
+    });
+
+}
+
+
+function closeEditPopup() {
+
+    document.getElementById("editPopup").classList.remove("active");
+
+    document.body.classList.remove("popup-open");
+}
+
+
+function closePopupOutside(event, popupId) {
+
+    if (event.target.id === popupId) {
+
+        if (popupId === "createPopup") {
+
+            closeCreatePopup();
+
+        } else {
+
+            closeEditPopup();
+
+        }
+
+    }
+
+}
+
+
+function addCreateColumn() {
+
+    const container =
+        document.getElementById("createColumns");
+
+    const row = document.createElement("div");
+
+    row.className = "column-form-row";
+
+    row.innerHTML = `
+
+        <input type="text"
+               name="column_name[]"
+               placeholder="Column name"
+               required>
+
+        <select name="column_type[]">
+
+            <option value="VARCHAR(255)">
+                VARCHAR(255)
+            </option>
+
+            <option value="TEXT">
+                TEXT
+            </option>
+
+            <option value="INTEGER">
+                INTEGER
+            </option>
+
+            <option value="BIGINT">
+                BIGINT
+            </option>
+
+            <option value="BOOLEAN">
+                BOOLEAN
+            </option>
+
+            <option value="DATE">
+                DATE
+            </option>
+
+            <option value="TIMESTAMP">
+                TIMESTAMP
+            </option>
+
+            <option value="NUMERIC">
+                NUMERIC
+            </option>
+
+        </select>
+
+        <button type="button"
+                class="remove-column-btn"
+                onclick="removeColumn(this)">
+            ×
+        </button>
+
+    `;
+
+    container.appendChild(row);
+}
+
+
+function addEditColumn(columnName = "") {
+
+    const container =
+        document.getElementById("editColumns");
+
+    const row = document.createElement("div");
+
+    row.className = "column-form-row";
+
+    row.innerHTML = `
+
+        <input type="text"
+               name="column_name[]"
+               value="${escapeHtml(columnName)}"
+               placeholder="Column name"
+               required>
+
+        <select name="column_type[]">
+
+            <option value="VARCHAR(255)">
+                VARCHAR(255)
+            </option>
+
+            <option value="TEXT">
+                TEXT
+            </option>
+
+            <option value="INTEGER">
+                INTEGER
+            </option>
+
+            <option value="BIGINT">
+                BIGINT
+            </option>
+
+            <option value="BOOLEAN">
+                BOOLEAN
+            </option>
+
+            <option value="DATE">
+                DATE
+            </option>
+
+            <option value="TIMESTAMP">
+                TIMESTAMP
+            </option>
+
+            <option value="NUMERIC">
+                NUMERIC
+            </option>
+
+        </select>
+
+        <button type="button"
+                class="remove-column-btn"
+                onclick="removeColumn(this)">
+            ×
+        </button>
+
+    `;
+
+    container.appendChild(row);
+}
+
+
+function removeColumn(button) {
+
+    const row = button.parentElement;
+
+    const container = row.parentElement;
+
+    if (container.children.length > 1) {
+
+        row.remove();
+
+    } else {
+
+        alert("At least one column is required.");
+
+    }
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ESC KEY */
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+
+        closeCreatePopup();
+
+        closeEditPopup();
+
+    }
+
+});
+
+</script>
+
+{% endif %}
+
 </body>
 </html>
