@@ -109,6 +109,24 @@ def database_logout():
     session.pop("database_authorized", None)
     return redirect(url_for("database"))
 
+@app.route("/create_table", methods=["POST"])
+def create_table():
+    table_name = request.form.get("table_name")
+    column_names = request.form.getlist("column_name[]")
+    column_types = request.form.getlist("column_type[]")
+    if not table_name:
+        return redirect(url_for("database"))
+    if not column_names:
+        return redirect(url_for("database"))
+
+@app.route("/edit_table", methods=["POST"])
+def edit_table():
+    old_table_name = request.form.get("old_table_name")
+    table_name = request.form.get("table_name")
+    column_names = request.form.getlist("column_name[]")
+    column_types = request.form.getlist("column_type[]")
+    return redirect(url_for("database"))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
