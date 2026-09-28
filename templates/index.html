@@ -55,7 +55,7 @@
                         <th colspan="{{ table.column_names|length }}">
                             {{ table.name }}
                             <form action="/delete_table" method="POST">
-                                <input type="text" value="{{table.name}}" required/>
+                                <input type="text" name="table_name" value="{{table.name}}" required/>
                                 <input type="submit" value="Delte table"/>
                             </form>
                         </th>
