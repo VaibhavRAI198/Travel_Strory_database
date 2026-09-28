@@ -5,33 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Story - Database</title>
-
-```
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}">
-```
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
-
 {% if not authorized %}
-
 <div class="login-container">
     <h1>Travel Story Database</h1>
     <p class="subtitle">Authorized Access Only</p>
-
-```
 {% if error %}
 <div class="error">{{ error }}</div>
 {% endif %}
-
 {% if success %}
 <div class="success">{{ success }}</div>
 {% endif %}
-
 <form action="{{ url_for('database') }}" method="POST">
-
     <div class="form-group">
         <label for="username">Username</label>
         <input type="text"
@@ -55,17 +42,13 @@
     <button type="submit" class="login-btn">
         Login
     </button>
-
 </form>
-```
 
 </div>
 
 {% else %}
 
 <div class="database-container">
-
-```
 <!-- HEADER -->
 <div class="database-header">
 
