@@ -26,20 +26,75 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Enter password" required autocomplete="current-password">
         </div>
-        <button type="submit" class="login-btn">
-            Login</button>
+        <button type="submit" class="login-btn">Login</button>
     </form>
 </div>
 {% else %}
-<!-- ================= AUTHORIZED DATABASE PAGE ================= -->
 <div class="database-container">
     <h1>Travel Story Database</h1>
-        <div class="database-actions">
-            <a href="#" class="database-btn">Create Tables</a>
-            <a href="#" class="database-btn">Show Tables</a>
-            <a href="{{ url_for('database_logout') }}" class="logout-btn">Logout</a>
-        </div>
+    <div class="database-actions">
+        <a href="#" class="database-btn">Create Tables</a>
+        <a href="{{ url_for('database') }}" class="database-btn">Show Tables</a>
+        <a href="{{ url_for('database_logout') }}" class="logout-btn">Logout</a>
     </div>
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    {% if tables %}
+    <div class="tables-container">
+        {% for table in tables %}
+        <div class="table-section">
+            <h2>{{ table.name }}</h2>
+            <h3>Columns</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Nullable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for column in table.columns %}
+                    <tr>
+                        <td>{{ column[0] }}</td>
+                        <td>{{ column[1] }}</td>
+                        <td>{{ column[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3>Data</h3>
+            {% if table.data %}
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in table.column_names %}
+                        <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table.data %}
+                    <tr>
+                        {% for value in row %}
+                        <td>{{ value if value is not none else "NULL" }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">No records found in this table.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-data">
+        <p>No tables found in the PostgreSQL database.</p>
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 </body>
