@@ -9,7 +9,7 @@ USERNAME = "raiv"
 PASSWORD = "64843810"
 
 def get_db_connection():
-    return psycopg2.connect(os.environ["postgresql://travel_story_db_user:eevilkspAPdWdQqz5qSrz5aS2qKq6SdY@dpg-darvprjbc2fs738okjs0-a/travel_story_db"])
+    return psycopg2.connect(os.environ["DATABASE_URL"])
     
 @app.route("/")
 def home():
