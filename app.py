@@ -126,7 +126,7 @@ def create_table():
         return render_template("create_table.html")
     return render_template("create_table.html")
 
-@app.route("/create_table", methods=["GET", "POST"])
+@app.route("/create_table", methods=["POST"])
 def create_table():
 
     # Check authorization
@@ -260,7 +260,7 @@ def create_table():
         )
 
 
-@app.route("/edit_table/<table_name>", methods=["GET", "POST"])
+@app.route("/edit_table/<table_name>", methods=["POST"])
 def edit_table(table_name):
 
     # Check authorization
