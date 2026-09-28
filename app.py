@@ -260,5 +260,173 @@ def create_table():
         )
 
 
+@app.route("/edit_table/<table_name>", methods=["GET", "POST"])
+def edit_table(table_name):
+
+    # Check authorization
+    if not session.get("database_authorized", False):
+        return redirect(url_for("database"))
+
+    try:
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check table exists
+        cursor.execute("""
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = %s
+            )
+        """, (table_name,))
+
+        if not cursor.fetchone()[0]:
+
+            cursor.close()
+            conn.close()
+
+            return redirect(url_for("database"))
+
+
+        # --------------------------------
+        # GET = SHOW EDIT PAGE
+        # --------------------------------
+
+        if request.method == "GET":
+
+            cursor.execute("""
+                SELECT
+                    column_name,
+                    data_type,
+                    is_nullable
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                AND table_name = %s
+                ORDER BY ordinal_position
+            """, (table_name,))
+
+            columns = cursor.fetchall()
+
+            cursor.close()
+            conn.close()
+
+            return render_template(
+                "edit_table.html",
+                table_name=table_name,
+                columns=columns
+            )
+
+
+        # --------------------------------
+        # POST = UPDATE TABLE
+        # --------------------------------
+
+        column_name = request.form.get("column_name")
+        new_column_name = request.form.get(
+            "new_column_name"
+        )
+        new_data_type = request.form.get(
+            "new_data_type"
+        )
+
+        if not column_name or not new_data_type:
+
+            cursor.close()
+            conn.close()
+
+            return redirect(
+                url_for(
+                    "edit_table",
+                    table_name=table_name
+                )
+            )
+
+
+        # Validate column names
+        if not new_column_name.replace(
+            "_", ""
+        ).isalnum():
+
+            raise ValueError(
+                "Invalid column name."
+            )
+
+
+        allowed_types = {
+            "INTEGER",
+            "BIGINT",
+            "SERIAL",
+            "BIGSERIAL",
+            "VARCHAR(255)",
+            "TEXT",
+            "BOOLEAN",
+            "DATE",
+            "TIMESTAMP",
+            "NUMERIC",
+            "REAL",
+            "DOUBLE PRECISION"
+        }
+
+
+        new_data_type = new_data_type.upper()
+
+
+        if new_data_type not in allowed_types:
+
+            raise ValueError(
+                "Invalid data type."
+            )
+
+
+        # Rename column
+        if column_name != new_column_name:
+
+            cursor.execute(
+                f'''
+                ALTER TABLE public."{table_name}"
+                RENAME COLUMN "{column_name}"
+                TO "{new_column_name}"
+                '''
+            )
+
+
+        # Change data type
+        cursor.execute(
+            f'''
+            ALTER TABLE public."{table_name}"
+            ALTER COLUMN "{new_column_name}"
+            TYPE {new_data_type}
+            USING "{new_column_name}"::{new_data_type}
+            '''
+        )
+
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+
+        return redirect(
+            url_for("database")
+        )
+
+
+    except Exception as e:
+
+        if "conn" in locals():
+            conn.rollback()
+            conn.close()
+
+        return render_template(
+            "edit_table.html",
+            table_name=table_name,
+            columns=[],
+            error=f"Database error: {e}"
+        )
+
+
 if __name__ == "__main__":
     app.run(debug=True)
