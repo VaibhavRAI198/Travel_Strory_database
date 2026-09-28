@@ -87,7 +87,7 @@ body{min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:radial-g
 
 .popup-overlay.active{opacity:1;visibility:visible;pointer-events:auto}
 
-.popup-box{width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(-25px) scale(.96);transition:transform .25s ease}
+.popup-box{width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column;overflow-y:scroll;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(-25px) scale(.96);transition:transform .25s ease}
 
 .popup-overlay.active .popup-box{transform:translateY(0) scale(1)}
 
