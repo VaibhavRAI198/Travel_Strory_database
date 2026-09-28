@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,10 +13,10 @@
     <h1>Travel Story Database</h1>
     <p class="subtitle">Authorized Access Only</p>
     {% if error %}
-        <div class="error">{{ error }}</div>
+    <div class="error">{{ error }}</div>
     {% endif %}
     {% if success %}
-        <div class="success">{{ success }}</div>
+    <div class="success">{{ success }}</div>
     {% endif %}
     <form action="{{ url_for('database') }}" method="POST">
         <div class="form-group">
@@ -31,53 +32,62 @@
 </div>
 {% else %}
 <div class="database-container">
-    <h1>Travel Story Database</h1>
-    <div class="database-actions">
-        <a href="#" class="database-btn">Create Tables</a>
-        <a href="{{ url_for('database') }}" class="database-btn">Show Tables</a>
-        <a href="{{ url_for('database_logout') }}" class="logout-btn">Logout</a>
+    <div class="database-header">
+        <div>
+            <h1>Travel Story Database</h1>
+            <p class="subtitle">PostgreSQL Database Management</p>
+        </div>
+        <div class="database-actions">
+            <a href="#" class="database-btn create-btn">Create Tables</a>
+            <a href="{{ url_for('database') }}" class="database-btn show-btn">Show Tables</a>
+            <a href="{{ url_for('database_logout') }}" class="logout-btn">Logout</a>
+        </div>
     </div>
     {% if error %}
     <div class="error">{{ error }}</div>
     {% endif %}
     {% if tables %}
     <div class="tables-container">
-    {% for table in tables %}
-    <div class="table-section">
-        <table class="database-table">
-            <thead>
-                <tr class="table-name-row">
-                    <th colspan="{{ table.column_names|length }}">{{ table.name }}</th>
-                </tr>
-                <tr class="column-row">
-                    {% for column in table.column_names %}
-                    <th>{{ column }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% if table.data %}
+        {% for table in tables %}
+        <div class="table-section">
+            <table class="database-table">
+                <thead>
+                    <tr class="table-name-row">
+                        <th colspan="{{ table.column_names|length }}">{{ table.name }}</th>
+                    </tr>
+                    <tr class="column-row">
+                        {% for column in table.column_names %}
+                        <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if table.data %}
                     {% for row in table.data %}
                     <tr>
                         {% for value in row %}
-                        <td>{{ value if value is not none else "NULL" }}</td>
+                        <td>
+                            {% if value is none %}
+                            <span class="null-value">NULL</span>
+                            {% else %}
+                            {{ value }}
+                            {% endif %}
+                        </td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                {% else %}
+                    {% else %}
                     <tr>
-                        <td colspan="{{ table.column_names|length }}" class="no-data">
-                            No data found in this table.
-                        </td>
+                        <td colspan="{{ table.column_names|length }}" class="no-data">No data found in this table.</td>
                     </tr>
-                {% endif %}
-            </tbody>
-        </table>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
     {% else %}
-    <div class="no-data">
+    <div class="no-data database-empty">
         <p>No tables found in the PostgreSQL database.</p>
     </div>
     {% endif %}
